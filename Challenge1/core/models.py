@@ -9,6 +9,10 @@ class FormTemplate(models.Model):
     ethnicity_active = models.BooleanField(default=True)
     disabilitiy_active = models.BooleanField(default=True)
     employment_status_active = models.BooleanField(default=True)
+    location_active = models.BooleanField(default=True)
+    number_people_live_in_household_active = models.BooleanField(default=True)
+    who_is_in_household_active = models.BooleanField(default=True)
+    income_active = models.BooleanField(default=True)
 
     @classmethod
     def get_default_pk(cls):
@@ -17,9 +21,13 @@ class FormTemplate(models.Model):
 
 class FormDetail(models.Model):
     template = models.ForeignKey(FormTemplate, default=FormTemplate.get_default_pk, on_delete=models.DO_NOTHING)
-    gender = models.CharField(max_length=3, blank=True, default='n/a')
-    pronouns = models.CharField(max_length=3, blank=True, default='n/a')
-    age = models.CharField(max_length=3, blank=True, default='n/a')
-    ethnicity = models.CharField(max_length=3, blank=True, default='n/a')
-    disabilitiy = models.CharField(max_length=3, blank=True, default='n/a')
-    employment_status = models.CharField(max_length=3, blank=True, default='n/a')
+    gender = models.CharField(max_length=13, blank=True, default='n/a')
+    pronouns = models.CharField(max_length=13, blank=True, default='n/a')
+    age = models.CharField(max_length=13, blank=True, default='n/a')
+    ethnicity = models.CharField(max_length=13, blank=True, default='n/a')
+    disabilitiy = models.CharField(max_length=13, blank=True, default='n/a')
+    employment_status = models.CharField(max_length=13, blank=True, default='n/a')
+    location = models.CharField(max_length=13, blank=True, default='n/a')
+    number_people_live_in_household = models.CharField(max_length=13, blank=True, default='n/a')
+    who_is_in_household = models.CharField(max_length=13, blank=True, default='n/a')
+    income = models.CharField(max_length=13, blank=True, default='n/a')

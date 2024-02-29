@@ -7,6 +7,7 @@ urlpatterns = [
     path('',views.index_view, name="index"),
     path('submit/',views.submitForm, name="submit"),
     path('form/',views.getForm, name="form"),
+    path('selectReport/',views.reportView, name="selectReport"),
     path('report/',views.getReport, name="report"),
     
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
