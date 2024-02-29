@@ -1,18 +1,53 @@
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import { useState, useEffect } from "react";
 
 export default function Form() {
+	const [data,setData]=useState([]);
+
 	const form = useForm();
 	const { register, control, handleSubmit, watch, reset, formState: { errors, touched } } = form;
 
-	const onSubmit = (data) => console.log(data); console.log(errors);
+	const onSubmit = (formData) => {
+		setData([...data, formData]);
+		// console.log(formData["age"]);
+		const filteredData = new FormData();
+		const jsonData = JSON.stringify(formData);
 
-	console.log(watch("example")); // watch input value by passing the name of it
+		// console.log(jsonData);
+		// console.log(filteredData);
+		// console.log(filteredData.append("key", "value"))
+		// console.log(jsonData.key;)
 
-	const defaultValues = {
-		select: "none",
-		input: ""
-	  };
+		filteredData.append("workshopName", formData['workshopName']);
+		console.log(filteredData.get('workshopName'));
+		filteredData.append("proNouns", formData['proNouns']);
+		filteredData.append("age", formData['age']);
+		
+		filteredData.append("ethnicity", formData['ethnicity']);
+		filteredData.append("disability", formData['disability']);
+		filteredData.append("employmentStatus", formData['employmentStatus']);
+		filteredData.append("location", formData['location']);
+		filteredData.append("nHousehold", formData['nHousehold']);
+		filteredData.append("income", formData['income']);
+	}
+
+	// useEffect(() => {
+	// 	if (data.length > 0) {
+	// 	  const filteredData = data.map(({ age, disability, employmentStatus }) => ({ age, disability, employmentStatus }));
+	// 	  const jsonData = JSON.stringify(filteredData);
+		  
+	// 	  const formData = new FormData();
+	// 	  formData.append("age", filteredData['age']);
+		  
+	// 	  // Now you can use the formData for your intended purpose
+	// 	  console.log(filteredData); 
+	// 	  console.log(jsonData);
+	// 	  console.log(formData.get("age"));
+	// 	}
+	//   }, [data]);
+
+
 	return (
 		<>
 			<form onSubmit={handleSubmit(onSubmit)}>
@@ -193,7 +228,7 @@ export default function Form() {
 				<p className="error">{errors.income?.message}</p>
 
 				
-				<button type="submit" onClick={() => reset({defaultValues})}>Submit</button>
+				<button type="submit" onClick={() => handleSubmit(onSubmit)}>Submit</button>
 			</form>
 			<DevTool control={control} />
 		</>
