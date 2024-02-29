@@ -2,8 +2,10 @@ from django.shortcuts import render,reverse
 from django.http import HttpResponse,JsonResponse
 from .models import FormTemplate,FormDetail
 import pandas as pd
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
-import mpld3
+from io import BytesIO
 
 # Create your views here.
 def index_view(request): 
@@ -51,29 +53,57 @@ def submitForm(request):
 
     return JsonResponse({'message':'success'},status=200)
 
+def reportView(request):
+    if not request.user.is_authenticated:
+        return HttpResponse(f'You are not authorized to access this page, click <a href="{reverse('index')}">here</a> here to go to the homepage')
+
+    code = request.GET.get('code')
+
+    return render(request,'report.html',{
+        'code':code,
+        'link':reverse('report')
+    })
+
 def getReport(request):
     if not request.user.is_authenticated:
         return HttpResponse(f'You are not authorized to access this page, click <a href="{reverse('index')}">here</a> here to go to the homepage')
     code = request.GET.get('code')
+    value = request.GET.get('value')
+
     template = FormTemplate.objects.filter(code=code)
     if template.exists():
         template = template[0]
     else:
         return HttpResponse(f'Invalid code, click <a href="{reverse('report')}">here</a> here to try again')
 
-    data = {}
+    data = []
+
     for form in template.formdetail_set.all():
-        pass
-    data = {'length': [1.5, 0.5, 1.2, 0.9, 3],
-            'width': [0.7, 0.2, 0.15, 0.2, 1.1]}
-    index = ['pig', 'rabbit', 'duck', 'chicken', 'horse']
-    df = pd.DataFrame(data, index=index)
+        for field in form._meta.get_fields():
+            if field.name == value:
+                data.append(getattr(form, field.name))
 
-    # Create a histogram
+  # Create a DataFrame with the frequency of each number
+    df = pd.DataFrame({'Number': data})
+    frequency_table = df['Number'].value_counts().reset_index()
+    frequency_table.columns = ['Number', 'Frequency']
+    
+    # Plot the table
     fig, ax = plt.subplots()
-    hist = df.hist(bins=3, ax=ax)
+    ax.bar(frequency_table['Number'], frequency_table['Frequency'], color='blue', edgecolor='black')
 
-    # Use mpld3 to embed the plot in HTML
-    html_code = mpld3.fig_to_html(fig)
+    # Customize bar chart
+    ax.set_ylabel('Frequency')
+    ax.set_title(f'Bar Chart: Report for {code}({value})')
 
-    return HttpResponse(html_code)
+    # Save the figure to a BytesIO buffer
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    # Create a Django HttpResponse with the image
+    response = HttpResponse(content_type='image/png')
+    response.write(buffer.read())
+
+    return response
