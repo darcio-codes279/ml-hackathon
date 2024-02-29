@@ -1,12 +1,13 @@
 // import { useState } from 'react'
 import './App.css'
+import Form from './components/reactform'
 
 function App() {
 
   return (
     <>
       <div>
-        adsf
+        <Form />
       </div>
     </>
   )
